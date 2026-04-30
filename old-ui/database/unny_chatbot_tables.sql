@@ -1,0 +1,66 @@
+-- UNIDA Gateway Unny Chatbot Tables
+-- This is optional if you use install_unida_unny_chatbot.php.
+
+CREATE TABLE IF NOT EXISTS ai_assistants (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    assistant_key VARCHAR(80) NOT NULL UNIQUE,
+    assistant_name VARCHAR(120) NOT NULL,
+    assistant_role VARCHAR(160) NOT NULL,
+    audience VARCHAR(80) NOT NULL DEFAULT 'all',
+    description TEXT NULL,
+    welcome_message TEXT NULL,
+    welcome_message_sw TEXT NULL,
+    is_enabled TINYINT(1) NOT NULL DEFAULT 1,
+    display_order INT UNSIGNED NOT NULL DEFAULT 1,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS ai_settings (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    setting_key VARCHAR(120) NOT NULL UNIQUE,
+    setting_value TEXT NULL,
+    setting_group VARCHAR(80) NOT NULL DEFAULT 'ai',
+    is_secret TINYINT(1) NOT NULL DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS chatbot_conversations (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    user_id INT UNSIGNED NULL,
+    session_id VARCHAR(128) NOT NULL,
+    assistant_key VARCHAR(80) NOT NULL DEFAULT 'unny',
+    language VARCHAR(12) NOT NULL DEFAULT 'sw',
+    channel VARCHAR(80) NOT NULL DEFAULT 'web',
+    title VARCHAR(180) NULL,
+    status VARCHAR(40) NOT NULL DEFAULT 'open',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS chatbot_messages (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    conversation_id BIGINT UNSIGNED NOT NULL,
+    sender VARCHAR(40) NOT NULL DEFAULT 'user',
+    assistant_key VARCHAR(80) NULL,
+    language VARCHAR(12) NOT NULL DEFAULT 'sw',
+    message MEDIUMTEXT NOT NULL,
+    intent VARCHAR(120) NULL,
+    metadata JSON NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS ai_tool_logs (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    user_id INT UNSIGNED NULL,
+    tool_key VARCHAR(120) NOT NULL,
+    assistant_key VARCHAR(80) NULL,
+    language VARCHAR(12) NOT NULL DEFAULT 'sw',
+    prompt TEXT NULL,
+    response MEDIUMTEXT NULL,
+    status VARCHAR(40) NOT NULL DEFAULT 'completed',
+    ip_address VARCHAR(64) NULL,
+    user_agent TEXT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

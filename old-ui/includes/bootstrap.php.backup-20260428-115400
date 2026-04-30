@@ -1,0 +1,26 @@
+<?php
+/**
+ * UNIDA Gateway Bootstrap
+ * Loads optional helper files safely.
+ */
+
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+$helperFiles = [
+    __DIR__ . '/helpers/security.php',
+    __DIR__ . '/helpers/response_helpers.php',
+    __DIR__ . '/helpers/db_helpers.php',
+    __DIR__ . '/helpers/activity_helpers.php',
+    __DIR__ . '/helpers/auth.php',
+    __DIR__ . '/helpers/permissions.php',
+    __DIR__ . '/helpers/dashboard_helpers.php',
+    __DIR__ . '/helpers/verification_helpers.php',
+];
+
+foreach ($helperFiles as $helperFile) {
+    if (file_exists($helperFile)) {
+        require_once $helperFile;
+    }
+}

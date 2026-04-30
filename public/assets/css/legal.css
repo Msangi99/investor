@@ -1,0 +1,85 @@
+/* UNIDA Gateway Legal Styles */
+.legal-page {
+    display: grid;
+    gap: 18px;
+}
+
+.legal-page h2 {
+    color: var(--deep-blue, #083B7A);
+    margin: 0 0 10px;
+    font-size: clamp(22px, 2.4vw, 30px);
+    letter-spacing: -0.5px;
+}
+
+.legal-page h3 {
+    color: var(--primary-blue, #0A5DB7);
+    margin: 18px 0 8px;
+    font-size: 17px;
+}
+
+.legal-page p {
+    color: #475467;
+    line-height: 1.75;
+    margin: 0 0 10px;
+}
+
+.legal-page a,
+.legal-consent a {
+    color: var(--primary-blue, #0A5DB7);
+    font-weight: 900;
+}
+
+.legal-panel {
+    border-left: 5px solid var(--primary-blue, #0A5DB7);
+}
+
+.legal-note {
+    border-left-color: var(--primary-green, #28A745);
+    background: radial-gradient(circle at 96% 10%, rgba(32, 201, 151, 0.14), transparent 28%), #fff;
+}
+
+.legal-consent {
+    display: grid;
+    gap: 12px;
+}
+
+.checkbox-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 14px;
+    border-radius: 16px;
+    background: #f8fcff;
+    border: 1px solid rgba(8, 59, 122, 0.10);
+    color: #475467;
+    font-size: 14px;
+    line-height: 1.55;
+    font-weight: 650;
+}
+
+.checkbox-row input {
+    margin-top: 4px;
+    flex: 0 0 auto;
+}
+
+.status-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.status-warning {
+    color: #92400e;
+    background: #fef3c7;
+}
+
+.status-danger {
+    color: #991b1b;
+    background: #fee2e2;
+}
+
+@media (max-width: 760px) {
+    .checkbox-row {
+        font-size: 13px;
+    }
+}

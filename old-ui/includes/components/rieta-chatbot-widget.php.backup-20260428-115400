@@ -1,0 +1,88 @@
+<?php
+$lang = function_exists('current_language') ? current_language() : ($_SESSION['lang'] ?? 'sw');
+
+$text = [
+    'sw' => [
+        'toggle' => 'Msaada',
+        'name' => 'Rieta',
+        'role' => 'Msaidizi wa UNIDA Gateway',
+        'welcome' => 'Habari, mimi ni Rieta. Chagua eneo unalohitaji msaada au andika swali lako.',
+        'placeholder' => 'Andika swali au concern...',
+        'send' => 'Tuma',
+        'human_title' => 'Tuma kwa human agent',
+        'full_name' => 'Jina kamili',
+        'email' => 'Email',
+        'phone' => 'Namba ya simu',
+        'concern' => 'Eleza concern yako',
+        'submit_support' => 'Tuma kwa Support',
+    ],
+    'en' => [
+        'toggle' => 'Help',
+        'name' => 'Rieta',
+        'role' => 'UNIDA Gateway Assistant',
+        'welcome' => 'Hello, I am Rieta. Choose the area you need help with or type your question.',
+        'placeholder' => 'Type your question or concern...',
+        'send' => 'Send',
+        'human_title' => 'Forward to human agent',
+        'full_name' => 'Full name',
+        'email' => 'Email',
+        'phone' => 'Phone number',
+        'concern' => 'Describe your concern',
+        'submit_support' => 'Send to Support',
+    ],
+];
+
+$t = $text[$lang] ?? $text['sw'];
+?>
+
+<div class="rieta-chatbot" id="rietaChatbot" data-lang="<?= e($lang); ?>">
+    <button class="rieta-toggle" type="button" id="rietaToggle" aria-expanded="false">
+        <i class="fa-solid fa-headset"></i>
+        <span><?= e($t['toggle']); ?></span>
+    </button>
+
+    <section class="rieta-panel" id="rietaPanel" aria-label="Rieta chatbot">
+        <header class="rieta-head">
+            <div>
+                <strong><?= e($t['name']); ?></strong>
+                <small><?= e($t['role']); ?></small>
+            </div>
+            <button type="button" id="rietaClose" aria-label="Close">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </header>
+
+        <div class="rieta-body" id="rietaBody">
+            <div class="rieta-msg bot"><?= e($t['welcome']); ?></div>
+
+            <div class="rieta-topics" id="rietaTopics">
+                <button type="button" data-topic="registration"><?= $lang === 'en' ? 'Create account' : 'Kujisajili'; ?></button>
+                <button type="button" data-topic="login_dashboard"><?= $lang === 'en' ? 'Login / Dashboard' : 'Login / Dashboard'; ?></button>
+                <button type="button" data-topic="verification"><?= $lang === 'en' ? 'Verification' : 'Uhakiki'; ?></button>
+                <button type="button" data-topic="business_readiness">Business readiness</button>
+                <button type="button" data-topic="investor_access"><?= $lang === 'en' ? 'Investor access' : 'Mwekezaji / Fursa'; ?></button>
+                <button type="button" data-topic="stakeholder"><?= $lang === 'en' ? 'Stakeholder support' : 'Msaada wa mdau'; ?></button>
+                <button type="button" data-topic="human_agent"><?= $lang === 'en' ? 'Talk to human agent' : 'Ongea na mtu'; ?></button>
+            </div>
+        </div>
+
+        <form class="rieta-form" id="rietaForm">
+            <input type="text" id="rietaInput" placeholder="<?= e($t['placeholder']); ?>" autocomplete="off">
+            <button type="submit" aria-label="<?= e($t['send']); ?>">
+                <i class="fa-solid fa-paper-plane"></i>
+            </button>
+        </form>
+
+        <form class="rieta-support-form" id="rietaSupportForm">
+            <strong><?= e($t['human_title']); ?></strong>
+            <input type="text" name="full_name" placeholder="<?= e($t['full_name']); ?>" required>
+            <input type="email" name="email" placeholder="<?= e($t['email']); ?>" required>
+            <input type="tel" name="phone" placeholder="<?= e($t['phone']); ?>" required>
+            <textarea name="concern" placeholder="<?= e($t['concern']); ?>" required></textarea>
+            <button type="submit">
+                <i class="fa-solid fa-envelope"></i>
+                <?= e($t['submit_support']); ?>
+            </button>
+        </form>
+    </section>
+</div>

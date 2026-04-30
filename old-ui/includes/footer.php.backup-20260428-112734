@@ -1,0 +1,90 @@
+<footer class="site-footer">
+    <div class="container footer-grid">
+        <div class="footer-about">
+            <a href="<?= e(COMPANY_URL); ?>" target="_blank" rel="noopener" class="footer-brand">
+                <span class="brand-mark small">
+                    <span class="drop drop-blue"></span>
+                    <span class="drop drop-green"></span>
+                </span>
+
+                <span>
+                    <strong><?= e(APP_NAME); ?></strong>
+                    <small><?= e(APP_SUBTITLE); ?></small>
+                </span>
+            </a>
+
+            <p>
+                UNIDA Gateway supports verified business access, investment readiness,
+                stakeholder coordination and data-driven ecosystem insights for Tanzania and beyond.
+            </p>
+        </div>
+
+        <div>
+            <h4>Platform</h4>
+            <a href="<?= e(BASE_URL); ?>index.php">Home</a>
+            <a href="<?= e(BASE_URL); ?>ecosystem.php">Ecosystem Flow</a>
+            <a href="<?= e(BASE_URL); ?>opportunities.php">Opportunities</a>
+            <a href="<?= e(BASE_URL); ?>contact.php">Contact</a>
+        </div>
+
+        <div>
+            <h4>Legal & Trust</h4>
+            <a href="<?= e(BASE_URL); ?>verification.php">UNIDA Verify</a>
+            <a href="<?= e(BASE_URL); ?>verification-policy.php">Verification Policy</a>
+            <a href="<?= e(BASE_URL); ?>terms.php">Terms of Use</a>
+            <a href="<?= e(BASE_URL); ?>privacy.php">Privacy Policy</a>
+        </div>
+
+        <div>
+            <h4>Contact</h4>
+
+            <a href="<?= e(COMPANY_URL); ?>" target="_blank" rel="noopener">
+                <?= e(COMPANY_NAME); ?>
+            </a>
+
+            <a href="mailto:<?= e(COMPANY_EMAIL); ?>">
+                <?= e(COMPANY_EMAIL); ?>
+            </a>
+
+            <a href="tel:+255762494775">
+                <?= e(COMPANY_PHONE); ?>
+            </a>
+
+            <a href="<?= e(COMPANY_URL); ?>" target="_blank" rel="noopener">
+                About UNIDA
+            </a>
+        </div>
+    </div>
+
+    <div class="container footer-bottom">
+        <span>
+            © <?= date('Y'); ?> <?= e(COMPANY_NAME); ?>. All rights reserved.
+        </span>
+
+        <span>
+            Designed and developed by
+            <a href="<?= e(COMPANY_URL); ?>" target="_blank" rel="noopener">
+                <?= e(COMPANY_NAME); ?>
+            </a>
+        </span>
+    </div>
+</footer>
+
+<?php
+$chatbotWidget = __DIR__ . '/components/chatbot-widget.php';
+
+if (file_exists($chatbotWidget)) {
+    include $chatbotWidget;
+}
+?>
+
+<link rel="stylesheet" href="<?= e(asset_url('css/chatbot.css')); ?>">
+
+<script>
+    window.UNIDA_BASE_URL = "<?= e(BASE_URL); ?>";
+</script>
+
+<script src="<?= e(asset_url('js/chatbot.js')); ?>"></script>
+<script src="<?= e(asset_url('js/main.js')); ?>"></script>
+</body>
+</html>
