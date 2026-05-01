@@ -45,10 +45,10 @@ Route::middleware(['legacy.role:business'])->group(function () {
     Route::post('/business/readiness.php', [BusinessWorkspaceController::class, 'saveReadiness'])->name('business.readiness.save');
     Route::get('/business/documents.php', [BusinessWorkspaceController::class, 'documents'])->name('business.documents');
     Route::post('/business/documents.php', [BusinessWorkspaceController::class, 'saveDocument'])->name('business.documents.save');
+    Route::get('/business/opportunities.php', [BusinessWorkspaceController::class, 'opportunities'])->name('business.opportunities');
+    Route::post('/business/opportunities.php', [BusinessWorkspaceController::class, 'saveOpportunity'])->name('business.opportunities.save');
 
     Route::middleware(['business.approved'])->group(function () {
-        Route::get('/business/opportunities.php', [BusinessWorkspaceController::class, 'opportunities'])->name('business.opportunities');
-        Route::post('/business/opportunities.php', [BusinessWorkspaceController::class, 'saveOpportunity'])->name('business.opportunities.save');
         Route::get('/business/connections.php', [BusinessWorkspaceController::class, 'connections'])->name('business.connections');
         Route::post('/business/connections.php', [BusinessWorkspaceController::class, 'saveConnection'])->name('business.connections.save');
         Route::post('/business/connections.php/status', [BusinessWorkspaceController::class, 'updateConnectionStatus'])->name('business.connections.status');
@@ -62,18 +62,22 @@ Route::middleware(['legacy.role:business'])->group(function () {
 
 // Investor routes
 Route::middleware(['legacy.role:investor'])->group(function () {
-    Route::get('/investor/dashboard.php', [PageController::class, 'investorDashboard'])->name('investor.dashboard');
-    Route::get('/investor/profile.php', [PageController::class, 'investorProfile'])->name('investor.profile');
+    Route::get('/investor/dashboard.php', [InvestorWorkspaceController::class, 'dashboard'])->name('investor.dashboard');
+    Route::get('/investor/profile.php', [InvestorWorkspaceController::class, 'profile'])->name('investor.profile');
+    Route::post('/investor/profile.php', [InvestorWorkspaceController::class, 'saveProfile'])->name('investor.profile.save');
     Route::get('/investor/discover.php', [InvestorWorkspaceController::class, 'discover'])->name('investor.discover');
     Route::post('/investor/discover.php/shortlist', [InvestorWorkspaceController::class, 'saveShortlist'])->name('investor.discover.shortlist');
-    Route::get('/investor/verified-businesses.php', [PageController::class, 'investorVerifiedBusinesses'])->name('investor.verified-businesses');
+    Route::get('/investor/verified-businesses.php', [InvestorWorkspaceController::class, 'verifiedBusinesses'])->name('investor.verified-businesses');
     Route::get('/investor/shortlist.php', [InvestorWorkspaceController::class, 'shortlist'])->name('investor.shortlist');
+    Route::post('/investor/shortlist.php/accept', [InvestorWorkspaceController::class, 'acceptProject'])->name('investor.shortlist.accept');
     Route::post('/investor/shortlist.php/stage', [InvestorWorkspaceController::class, 'updateShortlistStage'])->name('investor.shortlist.stage');
+    Route::get('/investor/my-projects.php', [InvestorWorkspaceController::class, 'myProjects'])->name('investor.my-projects');
     Route::get('/investor/pipeline.php', [InvestorWorkspaceController::class, 'pipeline'])->name('investor.pipeline');
-    Route::get('/investor/meetings.php', [PageController::class, 'investorMeetings'])->name('investor.meetings');
-    Route::get('/investor/insights.php', [PageController::class, 'investorInsights'])->name('investor.insights');
-    Route::get('/investor/messages.php', [PageController::class, 'investorMessages'])->name('investor.messages');
-    Route::get('/investor/settings.php', [PageController::class, 'investorSettings'])->name('investor.settings');
+    Route::get('/investor/meetings.php', [InvestorWorkspaceController::class, 'meetings'])->name('investor.meetings');
+    Route::get('/investor/insights.php', [InvestorWorkspaceController::class, 'insights'])->name('investor.insights');
+    Route::get('/investor/messages.php', [InvestorWorkspaceController::class, 'messages'])->name('investor.messages');
+    Route::get('/investor/settings.php', [InvestorWorkspaceController::class, 'settings'])->name('investor.settings');
+    Route::post('/investor/settings.php', [InvestorWorkspaceController::class, 'saveSettings'])->name('investor.settings.save');
 });
 
 // Stakeholder routes

@@ -226,7 +226,7 @@ class BusinessWorkspaceService
         }
     }
 
-    public function opportunitiesData(int $userId): array
+    public function opportunitiesData(int $userId, int $editOpportunityId = 0): array
     {
         $profile = $this->businessProfile($userId);
         $profileId = (int) ($profile?->id ?? 0);
@@ -240,24 +240,39 @@ class BusinessWorkspaceService
 
             $list = $query->orderByDesc('id')
                 ->limit(50)
-                ->get(['id', 'title', 'sector', 'region', 'funding_amount', 'currency', 'status', 'verification_status', 'created_at'])
+                ->get(['id', 'title', 'summary', 'sector', 'region', 'funding_amount', 'currency', 'stage', 'status', 'verification_status', 'created_at'])
                 ->map(static fn ($row): array => [
                     'id' => (int) $row->id,
                     'title' => (string) $row->title,
+                    'summary' => (string) ($row->summary ?? ''),
                     'sector' => (string) ($row->sector ?? ''),
                     'region' => (string) ($row->region ?? ''),
                     'funding_amount' => $row->funding_amount,
                     'currency' => (string) ($row->currency ?? 'TZS'),
+                    'stage' => (string) ($row->stage ?? 'mvp'),
                     'status' => (string) ($row->status ?? 'draft'),
                     'verification_status' => (string) ($row->verification_status ?? 'pending'),
+                    'is_active' => ((string) ($row->status ?? 'draft')) === 'published'
+                        && ((string) ($row->verification_status ?? 'pending')) === 'verified',
                     'created_at' => $row->created_at,
                 ])
                 ->all();
         }
 
+        $editOpportunity = null;
+        if ($editOpportunityId > 0) {
+            foreach ($list as $item) {
+                if ((int) $item['id'] === $editOpportunityId) {
+                    $editOpportunity = $item;
+                    break;
+                }
+            }
+        }
+
         return [
             'profile' => $profile,
             'opportunities' => $list,
+            'edit_opportunity' => $editOpportunity,
             'stages' => ['idea', 'prototype', 'mvp', 'early_revenue', 'growth', 'scale'],
             'funding_types' => ['equity', 'debt', 'grant', 'partnership', 'asset_finance', 'other'],
         ];
@@ -301,6 +316,115 @@ class BusinessWorkspaceService
         }
 
         DB::table('investment_opportunities')->insert($record);
+
+        if (isset($payload['document']) && $payload['document'] instanceof UploadedFile && Schema::hasTable('uploads')) {
+            $storedPath = $payload['document']->store('opportunity-documents', 'public');
+            $uploadColumns = Schema::getColumnListing('uploads');
+            $uploadRecord = $this->mapColumns($uploadColumns, [
+                'user_id' => $userId,
+                'related_type' => 'opportunity',
+                'related_id' => (int) ($record['id'] ?? 0) ?: null,
+                'original_name' => $payload['document']->getClientOriginalName(),
+                'stored_name' => basename($storedPath),
+                'file_path' => $storedPath,
+                'file_ext' => $payload['document']->getClientOriginalExtension(),
+                'mime_type' => $payload['document']->getMimeType(),
+                'file_size' => $payload['document']->getSize(),
+                'upload_status' => 'uploaded',
+            ]);
+
+            if (in_array('id', $uploadColumns, true)) {
+                $uploadRecord['id'] = $this->nextId('uploads');
+            }
+            if (in_array('created_at', $uploadColumns, true)) {
+                $uploadRecord['created_at'] = now();
+            }
+            if (in_array('updated_at', $uploadColumns, true)) {
+                $uploadRecord['updated_at'] = now();
+            }
+
+            DB::table('uploads')->insert($uploadRecord);
+        }
+    }
+
+    public function updateOpportunity(int $userId, int $opportunityId, array $payload): void
+    {
+        if ($userId <= 0 || $opportunityId <= 0 || ! Schema::hasTable('investment_opportunities')) {
+            return;
+        }
+
+        $profile = $this->businessProfile($userId);
+        $profileId = (int) ($profile?->id ?? 0);
+
+        $exists = DB::table('investment_opportunities')
+            ->where('id', $opportunityId)
+            ->where(function ($query) use ($userId, $profileId): void {
+                $query->where('created_by', $userId);
+                if ($profileId > 0) {
+                    $query->orWhere('business_profile_id', $profileId);
+                }
+            })
+            ->exists();
+
+        if (! $exists) {
+            return;
+        }
+
+        $columns = Schema::getColumnListing('investment_opportunities');
+        $update = $this->mapColumns($columns, [
+            'title' => $payload['title'] ?? null,
+            'summary' => $payload['summary'] ?? null,
+            'sector' => $payload['sector'] ?? null,
+            'region' => $payload['region'] ?? null,
+            'funding_amount' => $payload['funding_amount'] ?? null,
+            'currency' => $payload['currency'] ?? 'TZS',
+            'funding_type' => $payload['funding_type'] ?? 'equity',
+            'stage' => $payload['stage'] ?? 'mvp',
+        ]);
+        if (in_array('updated_at', $columns, true)) {
+            $update['updated_at'] = now();
+        }
+
+        DB::table('investment_opportunities')->where('id', $opportunityId)->update($update);
+
+        if (isset($payload['document']) && $payload['document'] instanceof UploadedFile && Schema::hasTable('uploads')) {
+            $storedPath = $payload['document']->store('opportunity-documents', 'public');
+            $uploadColumns = Schema::getColumnListing('uploads');
+
+            $existingUploadId = DB::table('uploads')
+                ->where('related_type', 'opportunity')
+                ->where('related_id', $opportunityId)
+                ->orderByDesc('id')
+                ->value('id');
+
+            $uploadPayload = $this->mapColumns($uploadColumns, [
+                'user_id' => $userId,
+                'related_type' => 'opportunity',
+                'related_id' => $opportunityId,
+                'original_name' => $payload['document']->getClientOriginalName(),
+                'stored_name' => basename($storedPath),
+                'file_path' => $storedPath,
+                'file_ext' => $payload['document']->getClientOriginalExtension(),
+                'mime_type' => $payload['document']->getMimeType(),
+                'file_size' => $payload['document']->getSize(),
+                'upload_status' => 'uploaded',
+            ]);
+            if (in_array('updated_at', $uploadColumns, true)) {
+                $uploadPayload['updated_at'] = now();
+            }
+
+            if (is_numeric($existingUploadId)) {
+                DB::table('uploads')->where('id', (int) $existingUploadId)->update($uploadPayload);
+            } else {
+                if (in_array('id', $uploadColumns, true)) {
+                    $uploadPayload['id'] = $this->nextId('uploads');
+                }
+                if (in_array('created_at', $uploadColumns, true)) {
+                    $uploadPayload['created_at'] = now();
+                }
+                DB::table('uploads')->insert($uploadPayload);
+            }
+        }
     }
 
     public function connectionsData(int $userId): array

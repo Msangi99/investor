@@ -1,0 +1,16 @@
+---
+description: Enforce complete full-stack delivery for user-role features
+alwaysApply: true
+---
+
+# User Role Full-Stack Implementation
+
+When implementing or updating user role and permission features, complete the full flow in the same task.
+
+- Create or update the controller logic.
+- Create or update web routes.
+- Create or update related models.
+- Create or update required migrations.
+- Create or update the UI/front-end pages.
+- Ensure the user role page is reachable from the sidebar navigation.
+- Keep all role-related changes scoped to the user role feature/pages so the behavior works end-to-end.

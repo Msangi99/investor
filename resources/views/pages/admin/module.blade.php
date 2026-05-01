@@ -278,6 +278,73 @@
                         </div>
                     @endif
                 </article>
+            @elseif ($moduleKey === 'opportunities')
+                @php $rows = $rows ?? []; @endphp
+                <article class="dashboard-panel">
+                    <div class="panel-head">
+                        <div><h3>Opportunity Reviews</h3><p>Open proposal documents and decide if each opportunity is published to investors.</p></div>
+                    </div>
+                    @if (empty($rows))
+                        <p class="auth-note">No opportunities found.</p>
+                    @else
+                        <div style="overflow:auto; width:100%;">
+                            <table class="table" style="width:100%; border-collapse:collapse;">
+                                <thead>
+                                    <tr>
+                                        <th style="text-align:left; padding:10px; border-bottom:1px solid #e5e7eb;">id</th>
+                                        <th style="text-align:left; padding:10px; border-bottom:1px solid #e5e7eb;">title</th>
+                                        <th style="text-align:left; padding:10px; border-bottom:1px solid #e5e7eb;">stage</th>
+                                        <th style="text-align:left; padding:10px; border-bottom:1px solid #e5e7eb;">business</th>
+                                        <th style="text-align:left; padding:10px; border-bottom:1px solid #e5e7eb;">status</th>
+                                        <th style="text-align:left; padding:10px; border-bottom:1px solid #e5e7eb;">verification</th>
+                                        <th style="text-align:left; padding:10px; border-bottom:1px solid #e5e7eb;">document</th>
+                                        <th style="text-align:left; padding:10px; border-bottom:1px solid #e5e7eb;">created</th>
+                                        <th style="text-align:left; padding:10px; border-bottom:1px solid #e5e7eb;">review</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach ($rows as $row)
+                                        <tr>
+                                            <td style="padding:10px; border-bottom:1px solid #f1f5f9;">{{ (int) ($row->id ?? 0) }}</td>
+                                            <td style="padding:10px; border-bottom:1px solid #f1f5f9;">{{ (string) ($row->title ?? '') }}</td>
+                                            <td style="padding:10px; border-bottom:1px solid #f1f5f9;">{{ (string) ($row->stage ?? '-') }}</td>
+                                            <td style="padding:10px; border-bottom:1px solid #f1f5f9;">{{ (string) ($row->business_name ?? '-') }}</td>
+                                            <td style="padding:10px; border-bottom:1px solid #f1f5f9;">{{ (string) ($row->status ?? '') }}</td>
+                                            <td style="padding:10px; border-bottom:1px solid #f1f5f9;">{{ (string) ($row->verification_status ?? '') }}</td>
+                                            <td style="padding:10px; border-bottom:1px solid #f1f5f9;">
+                                                @if (!empty($row->document_path))
+                                                    <a class="btn btn-soft" href="{{ asset('storage/'.$row->document_path) }}" target="_blank" rel="noopener">
+                                                        <i class="fa-solid fa-file-arrow-down"></i>
+                                                        {{ $row->document_name ?: 'View Document' }}
+                                                    </a>
+                                                @else
+                                                    <span class="auth-note">No document</span>
+                                                @endif
+                                            </td>
+                                            <td style="padding:10px; border-bottom:1px solid #f1f5f9;">{{ (string) ($row->created_at ?? '') }}</td>
+                                            <td style="padding:10px; border-bottom:1px solid #f1f5f9;">
+                                                <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                                                    <form method="post" action="/admin/opportunities.php/review">
+                                                        @csrf
+                                                        <input type="hidden" name="opportunity_id" value="{{ $row->id ?? 0 }}">
+                                                        <input type="hidden" name="status" value="published">
+                                                        <button class="btn btn-soft" type="submit">Publish</button>
+                                                    </form>
+                                                    <form method="post" action="/admin/opportunities.php/review">
+                                                        @csrf
+                                                        <input type="hidden" name="opportunity_id" value="{{ $row->id ?? 0 }}">
+                                                        <input type="hidden" name="status" value="rejected">
+                                                        <button class="btn btn-soft" type="submit">Decline</button>
+                                                    </form>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    @endif
+                </article>
             @else
                 @php $rows = $rows ?? []; @endphp
                 <article class="dashboard-panel">
@@ -302,8 +369,6 @@
                                         @if ($moduleKey === 'users')
                                             <th style="text-align:left; padding:10px; border-bottom:1px solid #e5e7eb;">actions</th>
                                         @elseif ($moduleKey === 'verifications')
-                                            <th style="text-align:left; padding:10px; border-bottom:1px solid #e5e7eb;">review</th>
-                                        @elseif ($moduleKey === 'opportunities')
                                             <th style="text-align:left; padding:10px; border-bottom:1px solid #e5e7eb;">review</th>
                                         @endif
                                     </tr>
@@ -368,29 +433,6 @@
                                                             <input type="hidden" name="business_profile_id" value="{{ $row->id ?? 0 }}">
                                                             <input type="hidden" name="status" value="rejected">
                                                             <button class="btn btn-soft" type="submit">Reject</button>
-                                                        </form>
-                                                    </div>
-                                                </td>
-                                            @elseif ($moduleKey === 'opportunities')
-                                                <td style="padding:10px; border-bottom:1px solid #f1f5f9;">
-                                                    <div style="display:flex; gap:6px; flex-wrap:wrap;">
-                                                        <form method="post" action="/admin/opportunities.php/review">
-                                                            @csrf
-                                                            <input type="hidden" name="opportunity_id" value="{{ $row->id ?? 0 }}">
-                                                            <input type="hidden" name="status" value="published">
-                                                            <button class="btn btn-soft" type="submit">Publish</button>
-                                                        </form>
-                                                        <form method="post" action="/admin/opportunities.php/review">
-                                                            @csrf
-                                                            <input type="hidden" name="opportunity_id" value="{{ $row->id ?? 0 }}">
-                                                            <input type="hidden" name="status" value="under_review">
-                                                            <button class="btn btn-soft" type="submit">Needs Update</button>
-                                                        </form>
-                                                        <form method="post" action="/admin/opportunities.php/review">
-                                                            @csrf
-                                                            <input type="hidden" name="opportunity_id" value="{{ $row->id ?? 0 }}">
-                                                            <input type="hidden" name="status" value="archived">
-                                                            <button class="btn btn-soft" type="submit">Archive</button>
                                                         </form>
                                                     </div>
                                                 </td>

@@ -82,28 +82,43 @@ class BusinessWorkspaceController extends Controller
         return back()->with('success', 'Document uploaded successfully.');
     }
 
-    public function opportunities(): View
+    public function opportunities(Request $request): View
     {
-        return view('pages.business.opportunities', $this->workspaceService->opportunitiesData($this->userId()));
+        return view('pages.business.opportunities', $this->workspaceService->opportunitiesData(
+            $this->userId(),
+            (int) $request->query('edit', 0)
+        ));
     }
 
     public function saveOpportunity(Request $request): RedirectResponse
     {
         $payload = $request->validate([
+            'opportunity_id' => ['nullable', 'integer', 'min:1'],
             'title' => ['required', 'string', 'max:220'],
+            'summary' => ['required', 'string'],
+            'document' => ['nullable', 'file', 'max:10240', 'mimes:pdf,doc,docx,png,jpg,jpeg'],
             'sector' => ['nullable', 'string', 'max:120'],
             'region' => ['nullable', 'string', 'max:120'],
-            'summary' => ['required', 'string'],
             'funding_amount' => ['nullable', 'numeric', 'min:0'],
             'currency' => ['nullable', 'string', 'max:10'],
-            'funding_type' => ['required', 'string', 'in:equity,debt,grant,partnership,asset_finance,other'],
-            'stage' => ['required', 'string', 'in:idea,prototype,mvp,early_revenue,growth,scale'],
-            'status' => ['required', 'string', 'in:draft,published'],
+            'funding_type' => ['nullable', 'string', 'in:equity,debt,grant,partnership,asset_finance,other'],
+            'stage' => ['nullable', 'string', 'in:idea,prototype,mvp,early_revenue,growth,scale'],
         ]);
+
+        $isEdit = (int) ($payload['opportunity_id'] ?? 0) > 0;
+        if (! $isEdit && ! $request->hasFile('document')) {
+            return back()->withErrors(['document' => 'Proposal document is required when creating an opportunity.'])->withInput();
+        }
+
+        $payload['status'] = 'published';
+        if ($isEdit) {
+            $this->workspaceService->updateOpportunity($this->userId(), (int) $payload['opportunity_id'], $payload);
+            return back()->with('success', 'Project proposal updated.');
+        }
 
         $this->workspaceService->saveOpportunity($this->userId(), $payload);
 
-        return back()->with('success', 'Investment request submitted.');
+        return back()->with('success', 'Project proposal submitted. It will be active after Super Admin verification.');
     }
 
     public function connections(): View

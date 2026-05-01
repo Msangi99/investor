@@ -4,6 +4,7 @@
     $pageTitle = 'Investor Dashboard';
     $pageName = 'investor-dashboard';
     $activeSidebar = 'overview';
+    $stats = $stats ?? ['published' => 0, 'verified' => 0, 'shortlisted' => 0, 'meetings' => 0];
 @endphp
 
 @section('content')
@@ -29,10 +30,10 @@
     <div class="container">
         <div class="dashboard-content">
             <div class="dashboard-stat-grid">
-                <article class="dash-stat"><span class="dash-icon"><i class="fa-solid fa-briefcase"></i></span><div><strong>0</strong><small>Published opportunities</small></div></article>
-                <article class="dash-stat"><span class="dash-icon green"><i class="fa-solid fa-circle-check"></i></span><div><strong>0</strong><small>Verified opportunities</small></div></article>
-                <article class="dash-stat"><span class="dash-icon cyan"><i class="fa-solid fa-bookmark"></i></span><div><strong>0</strong><small>Shortlisted</small></div></article>
-                <article class="dash-stat"><span class="dash-icon dark"><i class="fa-solid fa-calendar-check"></i></span><div><strong>0</strong><small>Meetings</small></div></article>
+                <article class="dash-stat"><span class="dash-icon"><i class="fa-solid fa-briefcase"></i></span><div><strong>{{ (int) ($stats['published'] ?? 0) }}</strong><small>Published opportunities</small></div></article>
+                <article class="dash-stat"><span class="dash-icon green"><i class="fa-solid fa-circle-check"></i></span><div><strong>{{ (int) ($stats['verified'] ?? 0) }}</strong><small>Verified opportunities</small></div></article>
+                <article class="dash-stat"><span class="dash-icon cyan"><i class="fa-solid fa-bookmark"></i></span><div><strong>{{ (int) ($stats['shortlisted'] ?? 0) }}</strong><small>Shortlisted</small></div></article>
+                <article class="dash-stat"><span class="dash-icon dark"><i class="fa-solid fa-calendar-check"></i></span><div><strong>{{ (int) ($stats['meetings'] ?? 0) }}</strong><small>Meetings requested</small></div></article>
             </div>
 
             <article class="dashboard-panel">
@@ -42,7 +43,7 @@
                 </div>
                 <div class="cards-grid two-columns">
                     <article class="info-card"><div class="icon-box"><i class="fa-solid fa-magnifying-glass-chart"></i></div><h3>Discover</h3><p>Find verified opportunities.</p><a class="btn btn-soft" href="/investor/discover.php">Open</a></article>
-                    <article class="info-card"><div class="icon-box"><i class="fa-solid fa-bookmark"></i></div><h3>Shortlist</h3><p>Save opportunities for review.</p><a class="btn btn-soft" href="/investor/shortlist.php">Open</a></article>
+                    <article class="info-card"><div class="icon-box"><i class="fa-solid fa-bookmark"></i></div><h3>Shortlist</h3><p>Save opportunities and move deal stages.</p><a class="btn btn-soft" href="/investor/shortlist.php">Open</a></article>
                 </div>
             </article>
         </div>

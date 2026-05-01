@@ -209,16 +209,44 @@ class AdminModuleService
         if (! $this->hasTable('investment_opportunities')) {
             return [];
         }
+        $rows = DB::table('investment_opportunities as io')
+            ->leftJoin('business_profiles as bp', 'bp.id', '=', 'io.business_profile_id')
+            ->orderByDesc('io.id')
+            ->limit(100)
+            ->get([
+                'io.id',
+                'io.title',
+                'io.stage',
+                'io.status',
+                'io.verification_status',
+                'io.created_at',
+                DB::raw("COALESCE(bp.business_name, '') as business_name"),
+            ])
+            ->map(function ($row) {
+                $document = null;
+                if ($this->hasTable('uploads')) {
+                    $document = DB::table('uploads')
+                        ->where('related_type', 'opportunity')
+                        ->where('related_id', (int) $row->id)
+                        ->orderByDesc('id')
+                        ->first(['original_name', 'file_path']);
+                }
 
-        return $this->selectFromTableWithFallback('investment_opportunities', [
-            'id' => 'NULL',
-            'title' => "''",
-            'sector' => "''",
-            'region' => "''",
-            'status' => "''",
-            'verification_status' => "''",
-            'created_at' => 'NULL',
-        ]);
+                return (object) [
+                    'id' => (int) $row->id,
+                    'title' => (string) ($row->title ?? ''),
+                    'stage' => (string) ($row->stage ?? ''),
+                    'business_name' => (string) ($row->business_name ?? ''),
+                    'status' => (string) ($row->status ?? ''),
+                    'verification_status' => (string) ($row->verification_status ?? ''),
+                    'document_name' => (string) ($document->original_name ?? ''),
+                    'document_path' => (string) ($document->file_path ?? ''),
+                    'created_at' => $row->created_at,
+                ];
+            })
+            ->all();
+
+        return $rows;
     }
 
     /**
@@ -512,14 +540,14 @@ class AdminModuleService
         }
 
         $update = [
-            'status' => $status,
+            'status' => $status === 'published' ? 'published' : 'archived',
             'updated_at' => now(),
         ];
         if ($status === 'published') {
             $update['verification_status'] = 'verified';
             $update['published_at'] = now();
-        } elseif ($status === 'under_review') {
-            $update['verification_status'] = 'needs_update';
+        } else {
+            $update['verification_status'] = 'rejected';
         }
 
         DB::table('investment_opportunities')

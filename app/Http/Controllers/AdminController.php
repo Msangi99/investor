@@ -259,7 +259,7 @@ class AdminController extends Controller
     {
         $validated = $request->validate([
             'opportunity_id' => ['required', 'integer', 'min:1'],
-            'status' => ['required', 'in:published,under_review,archived'],
+            'status' => ['required', 'in:published,rejected'],
         ]);
 
         $this->adminModuleService->reviewOpportunity(

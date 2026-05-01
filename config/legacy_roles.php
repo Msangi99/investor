@@ -29,6 +29,7 @@ return [
                 'discover' => ['label' => 'Discover', 'description' => 'Explore published opportunities across sectors and regions', 'uri' => '/investor/discover.php'],
                 'verified-businesses' => ['label' => 'Verified Businesses', 'description' => 'Browse businesses that have passed verification', 'uri' => '/investor/verified-businesses.php'],
                 'shortlist' => ['label' => 'Shortlist', 'description' => 'Save and manage opportunities of interest', 'uri' => '/investor/shortlist.php'],
+                'my-projects' => ['label' => 'My Projects', 'description' => 'Accepted opportunities with business contact information', 'uri' => '/investor/my-projects.php'],
                 'pipeline' => ['label' => 'Pipeline', 'description' => 'Track deals from saved through to decision stage', 'uri' => '/investor/pipeline.php'],
                 'meetings' => ['label' => 'Meetings', 'description' => 'Manage discovery calls, due diligence and stakeholder sessions', 'uri' => '/investor/meetings.php'],
                 'insights' => ['label' => 'Insights', 'description' => 'View sector briefs, reports and investment decision support', 'uri' => '/investor/insights.php'],
